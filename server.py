@@ -1,6 +1,8 @@
 #  coding: utf-8 
 import socketserver
 
+import re
+
 # Copyright 2013 Abram Hindle, Eddie Antonio Santos
 # 
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -31,6 +33,18 @@ class MyWebServer(socketserver.BaseRequestHandler):
     
     def handle(self):
         self.data = self.request.recv(1024).strip()
+
+        request = self.data.decode('utf-8')
+
+        # Determine the type of request
+        request_type = re.match(r'^GET', request)
+        request_type = request_type.group()
+
+        if request_type is not 'GET':
+            print("INVALID REQUEST")
+            print(request_type)
+
+
         print ("Got a request of: %s\n" % self.data)
         self.request.sendall(bytearray("OK",'utf-8'))
 
