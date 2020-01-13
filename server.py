@@ -1,7 +1,11 @@
 #  coding: utf-8 
 import socketserver
 
-import re
+from response import HTTPResponse
+
+from request import HTTPRequest
+
+from handler import HTTPWebHandler
 
 # Copyright 2013 Abram Hindle, Eddie Antonio Santos
 # 
@@ -33,20 +37,16 @@ class MyWebServer(socketserver.BaseRequestHandler):
     
     def handle(self):
         self.data = self.request.recv(1024).strip()
+        print("Got a request of: %s\n" % self.data)
 
-        request = self.data.decode('utf-8')
+        # Parse the request
+        request = HTTPRequest(self.data.decode('utf-8'))
 
-        # Determine the type of request
-        request_type = re.match(r'^GET', request)
-        request_type = request_type.group()
+        # Handle the request
+        handler = HTTPWebHandler(request)
 
-        if request_type is not 'GET':
-            print("INVALID REQUEST")
-            print(request_type)
-
-
-        print ("Got a request of: %s\n" % self.data)
-        self.request.sendall(bytearray("OK",'utf-8'))
+        # self.request.sendall(bytearray("OK",'utf-8'))
+        self.request.sendall(handler.response.resolve())
 
 if __name__ == "__main__":
     HOST, PORT = "localhost", 8080
