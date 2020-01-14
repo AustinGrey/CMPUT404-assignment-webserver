@@ -12,9 +12,9 @@ class HTTPRequest():
         # Parse the request string and store the values
         # Determine the type of request
         request_line = re.match(r'^([A-Z]+) ([^ ]+) HTTP/([0-9.]+)', request_string)
-        self.method = request_line.group(0)
-        self.uri = request_line.group(1)
-        self.version = request_line.group(2)
+        self.method = request_line.group(1)
+        self.uri = request_line.group(2)
+        self.version = request_line.group(3)
 
         # if self. != 'GET':
         #     # @todo invalid request error

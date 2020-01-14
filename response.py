@@ -9,9 +9,9 @@ class HTTPResponse():
 
     def __init__(self):
         """
-        Hardcoded to support HTML 1.1 right now
+        Hardcoded to support HTTP/1.1 right now
         """
-        self.protocol = 'HTML'
+        self.protocol = 'HTTP'
         self.version = '1.1'
 
         # By default, we assume the path is not found
@@ -23,6 +23,9 @@ class HTTPResponse():
         # Response contents
         self.contents = ""
 
+    def add_header(self, header_name, header_contents):
+        self.headers[header_name] = header_contents
+
 
 
     def resolve(self):
@@ -30,11 +33,14 @@ class HTTPResponse():
         Resolves the current request into a byte array appropriate for sending as a response
         :return: byte array
         """
-        output = f"{self.protocol}/{self.version} {self.code} {self.response_codes[self.code]}\n"
+        output = f"{self.protocol}/{self.version} {self.code} {self.response_codes[self.code]}\r\n"
 
-        for header, header_text in self.headers:
-            output += f"{header}: {header_text}\n"
+        # Calculate the content length
+        self.add_header('Content-Length', str(len(bytearray(self.contents, 'utf-8'))))
 
-        output += f"\n{self.contents}"
+        for header in self.headers:
+            output += f"{header}: {self.headers[header]}\r\n"
+
+        output += f"\r\n{self.contents}"
 
         return bytearray(output, 'utf-8')
